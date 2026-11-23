@@ -4,25 +4,69 @@ class ExperienceFormPage extends StatefulWidget {
   const ExperienceFormPage({super.key});
 
   @override
-  State<ExperienceFormPage> createState() => _ExperienceFormPage();
+  State<ExperienceFormPage> createState() => _ExperienceFormPageState();
 }
 
-class _ExperienceFormPage extends State<ExperienceFormPage> {
+class _ExperienceFormPageState extends State<ExperienceFormPage> {
   final _formKey = GlobalKey<FormState>();
 
-  String _experienceName = "";
-  String _description = "";
-  String _category = "Web Development"; // default
-  String _technologies = "";
-  String _experienceLink = "";
+  String _title = '';
+  String _description = '';
+  String? _category;
+  String _thumbnail = '';
+  String _startMonth = '';
+  String _startYear = '';
+  String _endMonth = '';
+  String _endYear = '';
 
   final List<String> _categories = [
-    'Web Development',
-    'Mobile Development',
-    'Machine Learning',
-    'Data Science',
-    'Other',
+    'Internship',
+    'Research',
+    'Volunteer',
+    'Part-time',
+    'Full-time',
+    'Freelance',
   ];
+
+  InputDecoration _decoration(String label, {String? hint}) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+    );
+  }
+
+  Widget _textField({
+    required String label,
+    required String initialValue,
+    required ValueChanged<String> onChanged,
+    String? hint,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+    bool required = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        initialValue: initialValue,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        decoration: _decoration(label, hint: hint),
+        onChanged: onChanged,
+        validator: required
+            ? (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter $label.';
+                }
+                return null;
+              }
+            : null,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,171 +75,136 @@ class _ExperienceFormPage extends State<ExperienceFormPage> {
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      // TODO: Add the drawer we created earlier
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === Experience Name ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Experience Name",
-                    labelText: "Experience Name",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _experienceName = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Enter a experience name.";
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              // === Description ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: "Experience Description",
-                    labelText: "Experience Description",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _description = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Enter a experience description.";
-                    }
-                    return null;
-                  },
-                ),
+              // title
+              _textField(
+                label: 'Experience Name',
+                initialValue: _title,
+                onChanged: (value) => _title = value,
+                required: true,
               ),
 
-              // === Category ===
+              // description
+              _textField(
+                label: 'Description',
+                initialValue: _description,
+                onChanged: (value) => _description = value,
+                maxLines: 5,
+                required: true,
+              ),
+
+              // category
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: "Experience Category",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  initialValue: _category,
+                  decoration: _decoration('Category'),
+                  value: _category,
                   items: _categories
                       .map(
-                        (category) => DropdownMenuItem(
+                        (category) => DropdownMenuItem<String>(
                           value: category,
                           child: Text(category),
                         ),
                       )
                       .toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _category = newValue!;
-                    });
+                  onChanged: (value) {
+                    setState(() => _category = value);
                   },
+                  validator: (value) =>
+                      value == null ? 'Please select a category.' : null,
                 ),
               ),
 
-              // === Technologies ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Example: Flutter, Django, Figma",
-                    labelText: "Technologies Used",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _technologies = value!;
-                    });
-                  },
-                ),
+              // thumbnail
+              _textField(
+                label: 'Thumbnail',
+                initialValue: _thumbnail,
+                onChanged: (value) => _thumbnail = value,
+                hint: 'Enter thumbnail URL',
+                keyboardType: TextInputType.url,
               ),
 
-              // === Experience Link ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Experience URL (optional)",
-                    labelText: "Experience Link",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _experienceLink = value!;
-                    });
-                  },
-                ),
+              // start_month and start_year
+              _textField(
+                label: 'Start Month',
+                initialValue: _startMonth,
+                onChanged: (value) => _startMonth = value,
+                hint: 'Example: January or 1',
+                required: true,
               ),
-              // === Save Button ===
+              _textField(
+                label: 'Start Year',
+                initialValue: _startYear,
+                onChanged: (value) => _startYear = value,
+                hint: 'Example: 2025',
+                keyboardType: TextInputType.number,
+                required: true,
+              ),
+
+              // end_month and end_year
+              _textField(
+                label: 'End Month',
+                initialValue: _endMonth,
+                onChanged: (value) => _endMonth = value,
+                hint: 'Leave blank if ongoing',
+              ),
+              _textField(
+                label: 'End Year',
+                initialValue: _endYear,
+                onChanged: (value) => _endYear = value,
+                hint: 'Leave blank if ongoing',
+                keyboardType: TextInputType.number,
+              ),
+
+              // save button
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.indigo),
+                      backgroundColor:
+                          WidgetStateProperty.all(Colors.indigo),
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         showDialog(
                           context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Project added successfully!'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Project Name: $_experienceName'),
-                                    Text('Description: $_description'),
-                                    Text('Category: $_category'),
-                                    Text('Technologies: $_technologies'),
-                                    Text('Link: $_experienceLink'),
-                                  ],
-                                ),
+                          builder: (context) => AlertDialog(
+                            title: const Text('Experience added successfully!'),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('Experience Name: $_title'),
+                                  Text('Description: $_description'),
+                                  Text('Category: $_category'),
+                                  Text('Thumbnail: $_thumbnail'),
+                                  Text('Start Month: $_startMonth'),
+                                  Text('Start Year: $_startYear'),
+                                  Text('End Month: $_endMonth'),
+                                  Text('End Year: $_endYear'),
+                                ],
                               ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _formKey.currentState!.reset();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                            ),
+                            actions: [
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                          ),
                         );
                       }
                     },
                     child: const Text(
-                      "Save",
+                      'Save',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
