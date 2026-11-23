@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 
 class EducationFormPage extends StatefulWidget {
   const EducationFormPage({super.key});
@@ -65,6 +66,7 @@ class _EducationFormPageState extends State<EducationFormPage> {
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
